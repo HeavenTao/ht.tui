@@ -61,6 +61,7 @@ pub fn build(b: *std.Build) void {
             // List of modules available for import in source files part of the
             // root module.
         }),
+        .use_llvm = true,
     });
 
     // This declares intent for the executable to be installed into the

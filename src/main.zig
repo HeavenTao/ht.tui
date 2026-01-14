@@ -45,7 +45,7 @@ pub fn main() !void {
 
         prevCells = curCells;
 
-        std.Thread.sleep(1000);
+        std.Thread.sleep(std.time.ns_per_s);
     }
 }
 
@@ -63,16 +63,14 @@ fn diff(allocator: Allocator, cur: []Cell, prev: []Cell) ![]Cell {
 
 fn setScreen(screen: []Cell, widgets: []Cell, col: u16) void {
     for (widgets) |value| {
-        @memcpy(screen[value.y * col + value.x], value);
+        screen[value.y * col + value.x] = value;
     }
 }
 
 fn print(cells: []Cell) void {
-    var bytes: [1]u8 = undefined;
     for (cells) |value| {
         cursor.moveCursor(value.x, value.y);
-        bytes[0] = value.byte;
-        std.fs.File.stdout().write(bytes);
+        std.debug.print("{}", .{value.byte});
     }
 }
 
@@ -90,7 +88,8 @@ fn initCells(allocator: Allocator, size: posix.winsize) ![]Cell {
 
 fn getSize(fd: std.posix.fd_t) ?posix.winsize {
     var winsize: posix.winsize = undefined;
-    const err = posix.system.ioctl(fd, posix.T.IOCGWINSZ, @intFromPtr(&winsize));
+    const err = std.os.linux.ioctl(fd, posix.T.IOCGWINSZ, @intFromPtr(&winsize));
+    // const err = posix.system.ioctl(fd, posix.T.IOCGWINSZ, @intFromPtr(&winsize));
     if (posix.errno(err) == .SUCCESS) {
         return winsize;
     } else {
@@ -116,7 +115,7 @@ fn makeRaw(fd: std.posix.fd_t) !std.posix.termios {
     raw.lflag.ECHO = false;
     raw.lflag.ECHONL = false;
     raw.lflag.ICANON = false;
-    raw.lflag.ISIG = false;
+    raw.lflag.ISIG = true;
     raw.lflag.IEXTEN = false;
 
     raw.cflag.CSIZE = .CS8;
