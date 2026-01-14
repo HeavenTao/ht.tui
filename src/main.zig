@@ -19,7 +19,8 @@ pub fn main() !void {
 
     const allocator = area.allocator();
 
-    var curCells = try initCells(allocator, size.?);
+    var curCells: []Cell = undefined;
+    curCells = try initCells(allocator, size.?);
     var prevCells = try initCells(allocator, size.?);
 
     var label = Label.init(0, 0, "hello", allocator);
@@ -35,7 +36,34 @@ pub fn main() !void {
         const cells = try label.getCells();
         defer allocator.free(cells);
 
+        setScreen(curCells, cells, size.?.col);
+
+        const diffCells = try diff(allocator, curCells, prevCells);
+        defer allocator.free(diffCells);
+
+        print(diffCells);
+
+        prevCells = curCells;
+
         std.Thread.sleep(1000);
+    }
+}
+
+fn diff(allocator: Allocator, cur: []Cell, prev: []Cell) ![]Cell {
+    var diffCells = try std.ArrayList(Cell).initCapacity(allocator, 100);
+
+    for (cur, 0..) |value, i| {
+        if (value.byte != prev[i].byte) {
+            try diffCells.appendBounded(cur[i]);
+        }
+    }
+
+    return diffCells.items;
+}
+
+fn setScreen(screen: []Cell, widgets: []Cell, col: u16) void {
+    for (widgets) |value| {
+        @memcpy(screen[value.y * col + value.x], value);
     }
 }
 
