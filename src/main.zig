@@ -11,6 +11,7 @@ pub fn main() !void {
 
     const size = getSize(std.fs.File.stdout().handle);
     if (size == null) {
+        std.debug.print("hello", .{});
         return;
     }
 
@@ -21,7 +22,8 @@ pub fn main() !void {
 
     var curCells: []Cell = undefined;
     curCells = try initCells(allocator, size.?);
-    var prevCells = try initCells(allocator, size.?);
+    var prevCells: []Cell = undefined;
+    prevCells = try initCells(allocator, size.?);
 
     var label = Label.init(0, 0, "hello", allocator);
 
@@ -38,27 +40,26 @@ pub fn main() !void {
 
         setScreen(curCells, cells, size.?.col);
 
-        const diffCells = try diff(allocator, curCells, prevCells);
-        defer allocator.free(diffCells);
+        var diffCells = try diff(allocator, curCells, prevCells);
+        defer diffCells.deinit(allocator);
 
-        print(diffCells);
+        print(diffCells.items);
 
-        prevCells = curCells;
+        @memcpy(prevCells, curCells);
 
         std.Thread.sleep(std.time.ns_per_s);
     }
 }
 
-fn diff(allocator: Allocator, cur: []Cell, prev: []Cell) ![]Cell {
-    var diffCells = try std.ArrayList(Cell).initCapacity(allocator, 100);
+fn diff(allocator: Allocator, cur: []Cell, prev: []Cell) !std.ArrayList(Cell) {
+    var diffCells = try std.ArrayList(Cell).initCapacity(allocator, 2);
 
     for (cur, 0..) |value, i| {
         if (value.byte != prev[i].byte) {
-            try diffCells.appendBounded(cur[i]);
+            try diffCells.append(allocator, cur[i]);
         }
     }
-
-    return diffCells.items;
+    return diffCells;
 }
 
 fn setScreen(screen: []Cell, widgets: []Cell, col: u16) void {
@@ -69,8 +70,8 @@ fn setScreen(screen: []Cell, widgets: []Cell, col: u16) void {
 
 fn print(cells: []Cell) void {
     for (cells) |value| {
-        cursor.moveCursor(value.x, value.y);
-        std.debug.print("{}", .{value.byte});
+        cursor.moveCursor(value.x + 1, value.y + 1);
+        std.debug.print("{c}", .{value.byte});
     }
 }
 
@@ -79,7 +80,7 @@ fn initCells(allocator: Allocator, size: posix.winsize) ![]Cell {
 
     for (0..size.row) |row| {
         for (0..size.col) |col| {
-            cells[row * size.col + col] = Cell.init(@intCast(col), @intCast(row), 32);
+            cells[(row) * size.col + col] = Cell.init(@intCast(col), @intCast(row), 32);
         }
     }
 
