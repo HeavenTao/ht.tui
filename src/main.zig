@@ -25,18 +25,22 @@ pub fn main() !void {
     var prevCells: []Cell = undefined;
     prevCells = try initCells(allocator, size.?);
 
-    var label = Label.init(0, 0, "hello", allocator);
+    var label = Label.init(0, 0, "hello");
 
     var index: usize = 0;
+
+    var area2 = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    const allocator2 = area2.allocator();
+
     while (true) {
+        defer _ = area2.reset(.free_all);
         index = index + 1;
 
-        const text = try std.fmt.allocPrint(allocator, "this is number:{d}", .{index});
+        const text = try std.fmt.allocPrint(allocator2, "this is number:{d}", .{index});
 
         label.setText(text);
 
-        const cells = try label.getCells();
-        defer allocator.free(cells);
+        const cells = try label.getCells(allocator2);
 
         setScreen(curCells, cells, size.?.col);
 
@@ -47,7 +51,7 @@ pub fn main() !void {
 
         @memcpy(prevCells, curCells);
 
-        std.Thread.sleep(std.time.ns_per_s);
+        // std.Thread.sleep(std.time.ns_per_ms);
     }
 }
 
