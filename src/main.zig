@@ -25,7 +25,11 @@ pub fn main() !void {
     var prevCells: []Cell = undefined;
     prevCells = try initCells(allocator, size.?);
 
-    var label = Label.init(0, 0, "hello");
+    var widgets = try allocator.alloc(Label, 10);
+
+    for (0..10) |value| {
+        widgets[value] = Label.init(0, @intCast(value), "hello");
+    }
 
     var index: usize = 0;
 
@@ -38,11 +42,11 @@ pub fn main() !void {
 
         const text = try std.fmt.allocPrint(allocator2, "this is number:{d}", .{index});
 
-        label.setText(text);
-
-        const cells = try label.getCells(allocator2);
-
-        setScreen(curCells, cells, size.?.col);
+        for (widgets) |*w| {
+            w.setText(text);
+            const cells = try w.getCells(allocator2);
+            setScreen(curCells, cells, size.?.col);
+        }
 
         var diffCells = try diff(allocator, curCells, prevCells);
         defer diffCells.deinit(allocator);

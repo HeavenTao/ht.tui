@@ -32,7 +32,7 @@ fn typeErasedGetCells(widget_ptr: *anyopaque) []Cell {
     return self.getCells();
 }
 
-pub fn getCells(self: *const Label, allocator: Allocator) ![]Cell {
+pub fn getCells(self: *Label, allocator: Allocator) ![]Cell {
     const cells = try allocator.alloc(Cell, self.text.len);
 
     for (self.text, 0..) |value, i| {
