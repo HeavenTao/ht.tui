@@ -1,9 +1,6 @@
 const Cell = @import("Cell.zig");
-const Translator = @This();
+const cursor = @import("ansi/cursor.zig");
 
-pub fn translate(self: Translator, cell: Cell) ![]u8 {
-    _ = self;
-    _ = cell;
-    //需要ANSII辅助完成
-    return null;
+pub fn translate(cell: Cell) ![]u8 {
+    cursor.move(allocator: Allocator, line: u16, col: u16)
 }

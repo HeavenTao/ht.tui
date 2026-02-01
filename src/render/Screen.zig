@@ -11,9 +11,7 @@ cells: []Cell,
 
 pub fn diff(self: Screen, other: Screen, allocator: Allocator) ![]Cell {
     if (self.rows != other.rows or self.cols != other.cols or self.cells.len != other.cells.len) {
-        const cells = try allocator.alloc(Cell, self.cells.len);
-        @memcpy(cells, self.cells);
-        return cells;
+        return try allocator.dupe(Cell, self.cells);
     }
 
     var diffCells: std.ArrayList(Cell) = .empty;
@@ -23,8 +21,7 @@ pub fn diff(self: Screen, other: Screen, allocator: Allocator) ![]Cell {
             try diffCells.append(allocator, self.cells[i]);
         }
     }
-    const cells = try allocator.alloc(Cell, diffCells.items.len);
-    @memcpy(cells, diffCells.items);
+    const cells = try diffCells.toOwnedSlice(allocator);
     return cells;
 }
 

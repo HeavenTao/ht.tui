@@ -5,7 +5,7 @@ const Render = @This();
 
 prevScreen: Screen,
 
-pub fn render(self: Render, screen: Screen, allocator: Allocator) void {
+pub fn render(self: Render, allocator: Allocator, screen: Screen) void {
     const diffCells = screen.diff(self.prevScreen, allocator) catch {
         return null;
     };
