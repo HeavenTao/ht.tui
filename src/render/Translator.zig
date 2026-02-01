@@ -9,7 +9,6 @@ pub fn translate(allocator: Allocator, cell: Cell) ![]u8 {
     var buf: std.ArrayList(u8) = .empty;
     defer buf.deinit(allocator);
 
-    //注意：终端是从1开始的
     const moveBuf = try cursor.move(allocator, cell.line + 1, cell.column + 1);
     defer allocator.free(moveBuf);
     try buf.appendSlice(allocator, moveBuf);
@@ -71,6 +70,8 @@ test "translate - 仅光标移动" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -97,6 +98,8 @@ test "translate - 带粗体样式" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -123,6 +126,8 @@ test "translate - 带斜体样式" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -149,6 +154,8 @@ test "translate - 带下划线样式" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -175,6 +182,8 @@ test "translate - 带闪烁样式" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -201,6 +210,8 @@ test "translate - 带反色样式" {
             .reverse = true,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -227,6 +238,8 @@ test "translate - 带隐藏样式" {
             .reverse = false,
             .hidden = true,
             .strikethrough = false,
+
+
         },
     };
 
@@ -253,6 +266,8 @@ test "translate - 带删除线样式" {
             .reverse = false,
             .hidden = false,
             .strikethrough = true,
+
+
         },
     };
 
@@ -279,6 +294,8 @@ test "translate - 带暗淡样式" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -288,7 +305,7 @@ test "translate - 带暗淡样式" {
     try testing.expectEqualStrings("\x1b[5;7H\x1b[2mA", result);
 }
 
-test "translate - 多个样式组合" {
+test "translate - 带多个样式组合" {
     const testing = std.testing;
     const allocator = testing.allocator;
 
@@ -305,6 +322,8 @@ test "translate - 多个样式组合" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -314,7 +333,7 @@ test "translate - 多个样式组合" {
     try testing.expectEqualStrings("\x1b[1;1H\x1b[1m\x1b[3m\x1b[4mA", result);
 }
 
-test "translate - 所有样式组合" {
+test "translate - 带所有样式组合" {
     const testing = std.testing;
     const allocator = testing.allocator;
 
@@ -331,6 +350,8 @@ test "translate - 所有样式组合" {
             .reverse = true,
             .hidden = true,
             .strikethrough = true,
+
+
         },
     };
 
@@ -358,6 +379,8 @@ test "translate - 大行列值" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -384,6 +407,8 @@ test "translate - 不同字节值影响输出" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -400,6 +425,8 @@ test "translate - 不同字节值影响输出" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -430,6 +457,8 @@ test "translate - 样式顺序" {
             .reverse = true,
             .hidden = true,
             .strikethrough = true,
+
+
         },
     };
 
@@ -456,6 +485,8 @@ test "translate - 特殊字符字节" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -472,6 +503,8 @@ test "translate - 特殊字符字节" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -488,6 +521,8 @@ test "translate - 特殊字符字节" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -522,6 +557,8 @@ test "translate - 空字节" {
             .reverse = false,
             .hidden = false,
             .strikethrough = false,
+
+
         },
     };
 
@@ -530,3 +567,4 @@ test "translate - 空字节" {
 
     try testing.expectEqualStrings("\x1b[1;1H\x00", result);
 }
+
