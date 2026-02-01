@@ -5,8 +5,8 @@ const mem = std.mem;
 // ==================== 光标控制 ====================
 
 /// 移动光标到原点 (0, 0)
-pub fn home(allocator: mem.Allocator) ![]u8 {
-    return try allocator.dupe(u8, "\x1b[H");
+pub fn home() []const u8 {
+    return "\x1b[H";
 }
 
 /// 移动光标到指定行列
@@ -55,37 +55,35 @@ pub fn column(allocator: mem.Allocator, col: u16) ![]u8 {
 }
 
 /// 请求光标位置
-pub fn requestPosition(allocator: mem.Allocator) ![]u8 {
-    return try allocator.dupe(u8, "\x1b[6n");
+pub fn requestPosition() []const u8 {
+    return "\x1b[6n";
 }
 
 /// 保存光标位置 (DEC)
-pub fn save(allocator: mem.Allocator) ![]u8 {
-    return try allocator.dupe(u8, "\x1b 7");
+pub fn save() []const u8 {
+    return "\x1b 7";
 }
 
 /// 恢复光标位置 (DEC)
-pub fn restore(allocator: mem.Allocator) ![]u8 {
-    return try allocator.dupe(u8, "\x1b 8");
+pub fn restore() []const u8 {
+    return "\x1b 8";
 }
 
 /// 保存光标位置 (SCO)
-pub fn saveSCO(allocator: mem.Allocator) ![]u8 {
-    return try allocator.dupe(u8, "\x1b[s");
+pub fn saveSCO() []const u8 {
+    return "\x1b[s";
 }
 
 /// 恢复光标位置 (SCO)
-pub fn restoreSCO(allocator: mem.Allocator) ![]u8 {
-    return try allocator.dupe(u8, "\x1b[u");
+pub fn restoreSCO() []const u8 {
+    return "\x1b[u";
 }
 
 // ==================== 测试 ====================
 
 test "home" {
     const testing = std.testing;
-    const allocator = testing.allocator;
-    const result = try home(allocator);
-    defer allocator.free(result);
+    const result = home();
     try testing.expectEqualStrings("\x1b[H", result);
 }
 
@@ -163,40 +161,30 @@ test "column" {
 
 test "requestPosition" {
     const testing = std.testing;
-    const allocator = testing.allocator;
-    const result = try requestPosition(allocator);
-    defer allocator.free(result);
+    const result = requestPosition();
     try testing.expectEqualStrings("\x1b[6n", result);
 }
 
 test "save" {
     const testing = std.testing;
-    const allocator = testing.allocator;
-    const result = try save(allocator);
-    defer allocator.free(result);
+    const result = save();
     try testing.expectEqualStrings("\x1b 7", result);
 }
 
 test "restore" {
     const testing = std.testing;
-    const allocator = testing.allocator;
-    const result = try restore(allocator);
-    defer allocator.free(result);
+    const result = restore();
     try testing.expectEqualStrings("\x1b 8", result);
 }
 
 test "saveSCO" {
     const testing = std.testing;
-    const allocator = testing.allocator;
-    const result = try saveSCO(allocator);
-    defer allocator.free(result);
+    const result = saveSCO();
     try testing.expectEqualStrings("\x1b[s", result);
 }
 
 test "restoreSCO" {
     const testing = std.testing;
-    const allocator = testing.allocator;
-    const result = try restoreSCO(allocator);
-    defer allocator.free(result);
+    const result = restoreSCO();
     try testing.expectEqualStrings("\x1b[u", result);
 }
